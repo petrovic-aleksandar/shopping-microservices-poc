@@ -6,7 +6,37 @@ dakle hendla authorizaciju i routing, service discovery, ali i pomaze da se impl
 i cross-cutting concerns: logging, monitoring i metrics, error handling, mozda load balancing.
 Drugi servis bi bio auth servis, ovo je tradicionalna jdbc blocking aplikacija, radi sinhrono.
 Treci servis order-service. tomcat sinhrona app, ali publishuje/subscribe na kafka topike.
-publishuje novi order na topic 'order.created'. slusa na topic 'payment.succeded'.
+publishuje novi order na topic 'order.created'. slusa na topic 'payment.succeeded'.
 Cetvrti servis inventory servis. Slusa 'order.created' i publishuje na 'reservation.succeeded'
 ili .failed. Dakle implementiramo saga pattern, gdje jedan mikroservice ceka signal od drugog.
 ako placanje fejluje, treba da vrati inventory(kompenzacija u saga patternu).
+Peti servis payment service. Slusa kafku na topic 'reservation.succeeded' i vrsi placanje,
+publishuje na 'payment.succeded' ili .failed. Nakon sto se poveze aplikacija, trebalo bi dodati 
+logging. za centralizovanje logova izgleda je najjednostavnije implementirati Grafana + Prometheus 
+ide za metriku. Jaeger za tracing.
+
+PLAN: create a minimal skeleton app that would aim to demonstrate microservice architecture.
+A shopping app. 
+
+One service would be a gateway, to redirect all the requests, implmenting
+reactive stack, non-blocking, for processing a large number of requests. netty with event loop,
+based on java nio, webflux. So, gateway handles auth, routing, service discovery. Could also
+help with cross-cutting concerns: logging, monitoring, metrics, error handling, maybe load balancing.
+
+Second service would be auth service, a traditional jdbc blocking app, synchronous.
+
+Third service, order-service. Tomacat synch app, but also publishes/subs to Kafka topics.
+Publishes a new order on 'order.created' topic. Subscribes to 'payment.succeeded'.
+
+Fourth service, inventory. Listens to 'order.created' topic, publishes to 'reservation.succeeded',
+or 'reservation.failed'. So, implements a saga pattern, where one microservice effectively waits
+for a signal from the other. If payment fails, rolls back the reservation(compensation in the saga 
+pattern). Subscribes to 'payment.failed'.
+
+Fifth service is payment-service. Subs to kafka topic 'reservation.succeeded' i tries payment,
+then publishes to 'payment.succeeded' or 'payment.failed'.
+
+After connecting everythig in the app, add logging. For centralized logging, simplest option seems 
+to be Grafana + Prometheus for metrics. Tracing with Jaeger.
+
+Next, look into resilience, retry logic for failed kafka messages..

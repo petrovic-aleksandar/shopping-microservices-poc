@@ -38,7 +38,7 @@ slusa kafku i na payment.failed, i vrati rezervaciju(kompenzacija u saga pattern
 payment-service
 8083
 tradicionalna tomcat sinhrona app, ali takodje i pub/subscribuje na kafka topics
-
+sub na reservation.succeded, vrsi placanje onda publish na payment.succeded ili failed
 
 kafka
 8085
