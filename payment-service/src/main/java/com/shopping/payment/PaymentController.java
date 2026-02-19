@@ -1,7 +1,7 @@
 package com.shopping.payment;
 
-import com.shopping.payment.model.OrderCreatedEvent;
 import com.shopping.payment.model.PaymentResultEvent;
+import com.shopping.payment.model.ReservationResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -33,10 +33,11 @@ public class PaymentController {
         return new ChargeResponse(request.orderId(), request.amount(), status);
     }
 
-    @KafkaListener(topics = "order.created", groupId = "payment-group")
-    public void consumeOrderCreated(OrderCreatedEvent event) {
-        String status = event.amount() <= 1000 ? "SUCCEEDED" : "FAILED";
-        PaymentResultEvent result = new PaymentResultEvent(event.orderId(), status, event.amount());
+    @KafkaListener(topics = "reservation.succeeded", groupId = "payment-group")
+    public void consumeReservationSucceeded(ReservationResultEvent event) {
+        // Only process payment after successful reservation
+        String status = event.quantity() * 100 <= 1000 ? "SUCCEEDED" : "FAILED"; // Simple logic based on quantity
+        PaymentResultEvent result = new PaymentResultEvent(event.orderId(), status, event.quantity() * 100);
 
         if ("SUCCEEDED".equals(status)) {
             kafkaTemplate.send("payment.succeeded", event.orderId(), result);

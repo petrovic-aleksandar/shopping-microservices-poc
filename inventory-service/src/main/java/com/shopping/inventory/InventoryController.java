@@ -1,9 +1,11 @@
 package com.shopping.inventory;
 
 import com.shopping.inventory.model.OrderCreatedEvent;
+import com.shopping.inventory.model.ReservationResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +18,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InventoryController {
 
     private final Map<String, Integer> stock = new ConcurrentHashMap<>();
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public InventoryController() {
+    public InventoryController(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
         stock.put("product-1", 100);
         stock.put("product-2", 50);
     }
@@ -40,7 +44,20 @@ public class InventoryController {
 
     @KafkaListener(topics = "order.created", groupId = "inventory-group")
     public void consumeOrderCreated(OrderCreatedEvent event) {
-        tryReserve(event.productId(), event.quantity());
+        boolean reserved = tryReserve(event.productId(), event.quantity());
+        ReservationResultEvent result = new ReservationResultEvent(
+                event.orderId(),
+                event.productId(),
+                event.quantity(),
+                reserved
+        );
+        
+        // Publish reservation result
+        if (reserved) {
+            kafkaTemplate.send("reservation.succeeded", event.orderId(), result);
+        } else {
+            kafkaTemplate.send("reservation.failed", event.orderId(), result);
+        }
     }
 
     private boolean tryReserve(String productId, int quantity) {

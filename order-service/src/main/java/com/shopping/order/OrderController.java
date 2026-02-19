@@ -2,6 +2,7 @@ package com.shopping.order;
 
 import com.shopping.order.model.OrderCreatedEvent;
 import com.shopping.order.model.PaymentResultEvent;
+import com.shopping.order.model.ReservationResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -58,6 +59,12 @@ public class OrderController {
     public void onPaymentFailed(PaymentResultEvent event) {
         orders.computeIfPresent(event.orderId(), (key, existing) ->
                 new OrderView(existing.id(), existing.userId(), existing.productId(), existing.quantity(), existing.amount(), "FAILED"));
+    }
+
+    @KafkaListener(topics = "reservation.failed", groupId = "order-group")
+    public void onReservationFailed(ReservationResultEvent event) {
+        orders.computeIfPresent(event.orderId(), (key, existing) ->
+                new OrderView(existing.id(), existing.userId(), existing.productId(), existing.quantity(), existing.amount(), "RESERVATION_FAILED"));
     }
 
     public record CreateOrderRequest(
