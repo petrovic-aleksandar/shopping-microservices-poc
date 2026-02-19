@@ -19,19 +19,26 @@ tradicionalna tomcat bloking aplikacija, zove je non-blocking async api-gateway
 
 order-service
 8082
-tradicionalna jdbc tomcat blocking app, ali takodje i publishuje i subscribuje na kafka topics.
+tradicionalna tomcat synch app, ali takodje i publishuje i subscribuje na kafka topics.
 kreira novi order sa statusom CREATED, publishuje order.created event, vraca order odmah(non-block)
 getuje order
 slusa payment rezultate - kafka consumer na topics payment.succeded, payment.failed
 saga pattern: kompenzacija se desi ako je failed event
 
-payment-service
-8083
-tradicionalna jdbc blocking app, ali takodje i subscribuje na kafka topics
-
-
 inventory-service
 8084
+tradicionalna tomcat sinhrona app, ali takodje pub/sub na kafka topike
+vraca stanje u magacinu
+rezervise producte manuelno
+slusa kafku order.created topic, i pokusa da rezervise, publishuje reservation.succeeded ili failed
+thread-safe kad pokusa da rezervise
+ovo je saga pattern sa kompenzacijom, ako je failed, payment se ne desi
+slusa kafku i na payment.failed, i vrati rezervaciju(kompenzacija u saga patternu)
+
+payment-service
+8083
+tradicionalna tomcat sinhrona app, ali takodje i pub/subscribuje na kafka topics
+
 
 kafka
 8085

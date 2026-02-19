@@ -1,7 +1,9 @@
 package com.shopping.inventory;
 
 import com.shopping.inventory.model.OrderCreatedEvent;
+import com.shopping.inventory.model.OrderReservation;
 import com.shopping.inventory.model.ReservationResultEvent;
+import com.shopping.inventory.model.PaymentResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InventoryController {
 
     private final Map<String, Integer> stock = new ConcurrentHashMap<>();
+    private final Map<String, OrderReservation> reservations = new ConcurrentHashMap<>();
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public InventoryController(KafkaTemplate<String, Object> kafkaTemplate) {
@@ -52,11 +55,29 @@ public class InventoryController {
                 reserved
         );
         
-        // Publish reservation result
+        // Store reservation for later compensation if payment fails
         if (reserved) {
+            reservations.put(event.orderId(), 
+                new OrderReservation(event.productId(), event.quantity()));
             kafkaTemplate.send("reservation.succeeded", event.orderId(), result);
         } else {
             kafkaTemplate.send("reservation.failed", event.orderId(), result);
+        }
+    }
+
+    @KafkaListener(topics = "payment.failed", groupId = "inventory-group")
+    public void onPaymentFailed(PaymentResultEvent event) {
+        // Release reserved inventory when payment fails (compensation)
+        releaseReservation(event.orderId());
+    }
+
+    private void releaseReservation(String orderId) {
+        OrderReservation reservation = reservations.remove(orderId);
+        if (reservation != null) {
+            synchronized (stock) {
+                int current = stock.getOrDefault(reservation.productId(), 0);
+                stock.put(reservation.productId(), current + reservation.quantity());
+            }
         }
     }
 

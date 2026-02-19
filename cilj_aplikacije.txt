@@ -1,0 +1,12 @@
+Kreirati skeleton-applikaciju koja bi demonstrirala mikro-servisnu arhitekturu.
+Tema bi bila shopping app. Jedan servis bi bio gateway koji bi bio preusmjeravao sve pozive,
+implementirao bi reactive stack, dakle non-blocking, da procesuira veliki broj requestova.
+netty sa event loopom, zasnovan na java NIO, webflux.
+dakle hendla authorizaciju i routing, service discovery, ali i pomaze da se implementiraju
+i cross-cutting concerns: logging, monitoring i metrics, error handling, mozda load balancing.
+Drugi servis bi bio auth servis, ovo je tradicionalna jdbc blocking aplikacija, radi sinhrono.
+Treci servis order-service. tomcat sinhrona app, ali publishuje/subscribe na kafka topike.
+publishuje novi order na topic 'order.created'. slusa na topic 'payment.succeded'.
+Cetvrti servis inventory servis. Slusa 'order.created' i publishuje na 'reservation.succeeded'
+ili .failed. Dakle implementiramo saga pattern, gdje jedan mikroservice ceka signal od drugog.
+ako placanje fejluje, treba da vrati inventory(kompenzacija u saga patternu).
