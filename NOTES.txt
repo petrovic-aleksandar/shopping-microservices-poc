@@ -1,0 +1,29 @@
+api-gateway 
+8080
+koristi spring boot, spring cloud gateway, reactive stack-spring webflux
+servlet api vs reactive streams api
+tomcat vs Netty(event loop as a core, continiously listens for I/O events, registers callbacks
+    when events occur, channel http req/resp, tcp socket, non blocking events queued to event loop
+    handler-code that processes eventss, pipeline-chain of handlers). netty is an async network
+    application framework built on java NIO
+thread per request vs event loop model(small thread pool)
+returns objects vs returns Mono<T> or Flux<T>
+blocking io vs non blocking i/o
+
+auth-service
+8081
+
+order-service
+8082
+
+payment-service
+8083
+
+inventory-service
+8084
+
+kafka
+8085
+
+
+

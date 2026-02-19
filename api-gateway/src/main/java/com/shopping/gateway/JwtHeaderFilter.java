@@ -21,6 +21,7 @@ public class JwtHeaderFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
+        // TODO za sad samo provjeravamo da li postoji header, kasnije ćemo dodati validaciju tokena
         String authHeader = request.getHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
