@@ -10,14 +10,25 @@ thread per request vs event loop model(small thread pool)
 returns objects vs returns Mono<T> or Flux<T>
 blocking io vs non blocking i/o
 
+reasons tu use a gateway: single entry point, auth, routing logic, cross cutting concerns(logging,
+    rate limiting, monitoring and metrics, error handling), load balancing, service discovery
+
 auth-service
 8081
+tradicionalna tomcat bloking aplikacija, zove je non-blocking async api-gateway
 
 order-service
 8082
+tradicionalna jdbc tomcat blocking app, ali takodje i publishuje i subscribuje na kafka topics.
+kreira novi order sa statusom CREATED, publishuje order.created event, vraca order odmah(non-block)
+getuje order
+slusa payment rezultate - kafka consumer na topics payment.succeded, payment.failed
+saga pattern: kompenzacija se desi ako je failed event
 
 payment-service
 8083
+tradicionalna jdbc blocking app, ali takodje i subscribuje na kafka topics
+
 
 inventory-service
 8084
