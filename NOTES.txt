@@ -40,8 +40,24 @@ payment-service
 tradicionalna tomcat sinhrona app, ali takodje i pub/subscribuje na kafka topics
 sub na reservation.succeded, vrsi placanje onda publish na payment.succeded ili failed
 
-kafka
-8085
+kafka + zookeeper + kafka ui
+kafka: 9092 (broker port)
+zookeeper: 2181 (koordinacija za kafku)
+kafka-ui: 8085 (web interface za management i monitoring)
+distributed event streaming platform, pub/sub messaging, event sourcing
+koristi se za komunikaciju izmedju mikroservisa (order -> inventory -> payment)
+topics: order.created, reservation.succeeded, reservation.failed, payment.succeeded, payment.failed
+
+centralized logging:
+elk stack (elasticsearch + kibana + filebeat)
+elasticsearch: 9200 (REST API), 9300 (node communication)
+kibana: 5601 (web UI za pretragu i vizualizaciju logova)
+filebeat: log shipper, prikuplja logove iz /logs direktorijuma i salje ih u elasticsearch
+centralized logging - svi logovi iz svih mikroservisa na jednom mestu
+structured logging - JSON format sa logstash encoder
+indeksi po servisu: order-service-*, inventory-service-*, payment-service-*
+mogu se pretrazivati logovi po servisu, nivou (ERROR, INFO), timestamp-u
+multiline pattern za Java stack trace-ove
 
 
 

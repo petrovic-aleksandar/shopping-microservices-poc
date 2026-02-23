@@ -10,12 +10,12 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI)..."
+echo "Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI, ELK Stack)..."
 docker compose up -d
 
-containers=(shopping-postgres shopping-zookeeper shopping-kafka shopping-kafka-ui)
-max_attempts=20
-delay_seconds=3
+containers=(shopping-postgres shopping-zookeeper shopping-kafka shopping-kafka-ui shopping-elasticsearch shopping-kibana shopping-filebeat)
+max_attempts=30
+delay_seconds=5
 
 echo "Waiting for containers to reach running state..."
 for ((attempt=1; attempt<=max_attempts; attempt++)); do
@@ -30,6 +30,8 @@ for ((attempt=1; attempt<=max_attempts; attempt++)); do
   if [[ "$running" -eq "${#containers[@]}" ]]; then
     echo "Infrastructure is up."
     echo "Kafka UI: http://localhost:8085"
+    echo "Kibana: http://localhost:5601"
+    echo "Elasticsearch: http://localhost:9200"
     exit 0
   fi
 

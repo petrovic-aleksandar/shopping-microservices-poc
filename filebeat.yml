@@ -1,0 +1,92 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /logs/order-service.log
+    fields:
+      service: order-service
+      environment: local
+    fields_under_root: true
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /logs/inventory-service.log
+    fields:
+      service: inventory-service
+      environment: local
+    fields_under_root: true
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /logs/payment-service.log
+    fields:
+      service: payment-service
+      environment: local
+    fields_under_root: true
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /logs/auth-service.log
+    fields:
+      service: auth-service
+      environment: local
+    fields_under_root: true
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+  - type: log
+    enabled: true
+    paths:
+      - /logs/api-gateway.log
+    fields:
+      service: api-gateway
+      environment: local
+    fields_under_root: true
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  indices:
+    - index: "order-service-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "order-service"
+    - index: "inventory-service-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "inventory-service"
+    - index: "payment-service-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "payment-service"
+    - index: "auth-service-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "auth-service"
+    - index: "api-gateway-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "api-gateway"
+
+setup.kibana:
+  host: "kibana:5601"
+
+setup.ilm.enabled: false
+setup.template.name: "microservices"
+setup.template.pattern: "*-service-*"
