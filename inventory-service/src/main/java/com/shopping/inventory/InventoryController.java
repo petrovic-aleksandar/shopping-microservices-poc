@@ -45,6 +45,15 @@ public class InventoryController {
         return new ReserveResponse(request.orderId(), request.productId(), request.quantity(), success);
     }
 
+    @PostMapping("/inventory/add")
+    public AddStockResponse addStock(@RequestBody AddStockRequest request) {
+        synchronized (stock) {
+            int current = stock.getOrDefault(request.productId(), 0);
+            stock.put(request.productId(), current + request.quantity());
+            return new AddStockResponse(request.productId(), current + request.quantity());
+        }
+    }
+
     @KafkaListener(topics = "order.created", groupId = "inventory-group")
     public void consumeOrderCreated(OrderCreatedEvent event) {
         boolean reserved = tryReserve(event.productId(), event.quantity());
@@ -96,5 +105,11 @@ public class InventoryController {
     }
 
     public record ReserveResponse(String orderId, String productId, int quantity, boolean reserved) {
+    }
+
+    public record AddStockRequest(@NotBlank String productId, @Min(1) int quantity) {
+    }
+
+    public record AddStockResponse(String productId, int newTotal) {
     }
 }
