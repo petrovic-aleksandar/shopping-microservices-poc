@@ -1,8 +1,8 @@
 package com.shopping.order;
 
-import com.shopping.order.model.OrderCreatedEvent;
-import com.shopping.order.model.PaymentResultEvent;
-import com.shopping.order.model.ReservationResultEvent;
+import com.shopping.events.OrderCreatedEvent;
+import com.shopping.events.PaymentResultEvent;
+import com.shopping.events.ReservationResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,4 +1,4 @@
-package com.shopping.inventory.model;
+package com.shopping.events;
 
 public record ReservationResultEvent(
         String orderId,

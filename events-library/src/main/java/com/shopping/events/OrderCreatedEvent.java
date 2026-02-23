@@ -1,4 +1,4 @@
-package com.shopping.order.model;
+package com.shopping.events;
 
 public record OrderCreatedEvent(
         String orderId,

@@ -1,7 +1,7 @@
 package com.shopping.payment;
 
-import com.shopping.payment.model.PaymentResultEvent;
-import com.shopping.payment.model.ReservationResultEvent;
+import com.shopping.events.PaymentResultEvent;
+import com.shopping.events.ReservationResultEvent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.kafka.annotation.KafkaListener;
