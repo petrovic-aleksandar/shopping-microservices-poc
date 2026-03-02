@@ -59,5 +59,7 @@ indeksi po servisu: order-service-*, inventory-service-*, payment-service-*
 mogu se pretrazivati logovi po servisu, nivou (ERROR, INFO), timestamp-u
 multiline pattern za Java stack trace-ove
 
+logback-spring.xml je konfiguracija springovog Logback frameworka
+
 
 
