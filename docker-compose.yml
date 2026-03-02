@@ -97,6 +97,11 @@ services:
         condition: service_healthy
     volumes:
       - ./logs:/logs:ro
+      - ./order-service/logs:/order-service/logs:ro
+      - ./inventory-service/logs:/inventory-service/logs:ro
+      - ./payment-service/logs:/payment-service/logs:ro
+      - ./auth-service/logs:/auth-service/logs:ro
+      - ./api-gateway/logs:/api-gateway/logs:ro
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - filebeat_data:/usr/share/filebeat/data
     command: filebeat -e -strict.perms=false

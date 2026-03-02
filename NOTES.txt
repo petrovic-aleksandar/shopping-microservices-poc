@@ -61,5 +61,8 @@ multiline pattern za Java stack trace-ove
 
 logback-spring.xml je konfiguracija springovog Logback frameworka
 
+filebeat cita lokalne logove, korsteci harvestere, koji cekaju nove linije loga. filebeat onda 
+ extractuje fieldove, dodaje metadata. onda salje parsirane eventove elasticsearchu
+
 
 
