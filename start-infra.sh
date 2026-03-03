@@ -10,10 +10,10 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI, ELK Stack)..."
+echo "Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI, ELK Stack, Prometheus, Grafana, Alertmanager)..."
 docker compose up -d
 
-containers=(shopping-postgres shopping-zookeeper shopping-kafka shopping-kafka-ui shopping-elasticsearch shopping-kibana shopping-filebeat)
+containers=(shopping-postgres shopping-zookeeper shopping-kafka shopping-kafka-ui shopping-elasticsearch shopping-kibana shopping-filebeat shopping-prometheus shopping-grafana shopping-alertmanager)
 max_attempts=30
 delay_seconds=5
 
@@ -32,6 +32,9 @@ for ((attempt=1; attempt<=max_attempts; attempt++)); do
     echo "Kafka UI: http://localhost:8085"
     echo "Kibana: http://localhost:5601"
     echo "Elasticsearch: http://localhost:9200"
+    echo "Prometheus: http://localhost:9090"
+    echo "Grafana: http://localhost:3000"
+    echo "Alertmanager: http://localhost:9093"
     exit 0
   fi
 

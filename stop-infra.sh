@@ -11,6 +11,9 @@ containers=(
     "shopping-elasticsearch"
     "shopping-kibana"
     "shopping-filebeat"
+    "shopping-prometheus"
+    "shopping-grafana"
+    "shopping-alertmanager"
 )
 
 # Stop each container

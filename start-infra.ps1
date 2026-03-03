@@ -11,10 +11,10 @@ try {
     exit 1
 }
 
-Write-Host 'Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI)...' -ForegroundColor Cyan
+Write-Host 'Starting infrastructure (Postgres, Zookeeper, Kafka, Kafka UI, ELK Stack, Prometheus, Grafana, Alertmanager)...' -ForegroundColor Cyan
 docker compose up -d
 
-$containers = @('shopping-postgres', 'shopping-zookeeper', 'shopping-kafka', 'shopping-kafka-ui')
+$containers = @('shopping-postgres', 'shopping-zookeeper', 'shopping-kafka', 'shopping-kafka-ui', 'shopping-elasticsearch', 'shopping-kibana', 'shopping-filebeat', 'shopping-prometheus', 'shopping-grafana', 'shopping-alertmanager')
 $maxAttempts = 20
 $delaySeconds = 3
 
@@ -31,6 +31,11 @@ for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     if ($running.Count -eq $containers.Count) {
         Write-Host 'Infrastructure is up.' -ForegroundColor Green
         Write-Host 'Kafka UI: http://localhost:8085' -ForegroundColor Green
+        Write-Host 'Kibana: http://localhost:5601' -ForegroundColor Green
+        Write-Host 'Elasticsearch: http://localhost:9200' -ForegroundColor Green
+        Write-Host 'Prometheus: http://localhost:9090' -ForegroundColor Green
+        Write-Host 'Grafana: http://localhost:3000' -ForegroundColor Green
+        Write-Host 'Alertmanager: http://localhost:9093' -ForegroundColor Green
         exit 0
     }
 

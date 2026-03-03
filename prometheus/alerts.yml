@@ -1,0 +1,38 @@
+groups:
+  - name: microservices-alerts
+    rules:
+      - alert: ServiceDown
+        expr: up{job=~"api-gateway|auth-service|order-service|payment-service|inventory-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Prometheus cannot scrape {{ $labels.job }} for more than 1 minute."
+
+      - alert: HighHttpErrorRate
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{job=~"api-gateway|auth-service|order-service|payment-service|inventory-service",status=~"5.."}[5m])) by (job)
+            /
+            sum(rate(http_server_requests_seconds_count{job=~"api-gateway|auth-service|order-service|payment-service|inventory-service"}[5m])) by (job)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx rate on {{ $labels.job }}"
+          description: "5xx error rate is above 5% for 5 minutes."
+
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(http_server_requests_seconds_bucket{job=~"api-gateway|auth-service|order-service|payment-service|inventory-service"}[5m])) by (job, le)
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency on {{ $labels.job }}"
+          description: "p95 HTTP latency is above 1s for 10 minutes."
