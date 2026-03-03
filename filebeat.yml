@@ -97,3 +97,12 @@ setup.template.settings:
   index.number_of_shards: 1
   index.number_of_replicas: 0
 setup.template.json.enabled: false
+
+# Debugging
+logging.level: debug
+logging.to_files: true
+logging.files:
+  path: ./logs
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644

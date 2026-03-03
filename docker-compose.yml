@@ -96,7 +96,7 @@ services:
       elasticsearch:
         condition: service_healthy
     volumes:
-      - ./logs:/logs:ro
+      - ./logs:/logs
       - ./order-service/logs:/order-service/logs:ro
       - ./inventory-service/logs:/inventory-service/logs:ro
       - ./payment-service/logs:/payment-service/logs:ro
